@@ -32,7 +32,7 @@ def serve_static(path):
 # === Load CSV data using absolute path ===
 def load_data(category):
     try:
-        filepath = os.path.join(os.path.dirname(__file__), "backend", "data", f"{category}.csv")
+        filepath = os.path.join(os.path.dirname(__file__), "..", "data", f"{category}.csv")
         print(f"[DEBUG] Trying to load: {filepath}")
 
         if not os.path.exists(filepath):
