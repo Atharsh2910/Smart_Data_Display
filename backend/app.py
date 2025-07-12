@@ -32,7 +32,9 @@ def serve_static(path):
 # === Load CSV data using absolute path ===
 def load_data(category):
     try:
+        # FIXED: go up one level to reach root/data/
         filepath = os.path.join(os.path.dirname(__file__), "..", "data", f"{category}.csv")
+        filepath = os.path.abspath(filepath)
         print(f"[DEBUG] Trying to load: {filepath}")
 
         if not os.path.exists(filepath):
@@ -42,7 +44,6 @@ def load_data(category):
         df = pd.read_csv(filepath)
         print(f"[DEBUG] Loaded raw rows: {df.shape[0]}")
 
-        # Safely convert rating and price columns
         df["rating"] = pd.to_numeric(df.get("rating", 0), errors="coerce").fillna(0)
         df["price"] = pd.to_numeric(df.get("price", 0), errors="coerce").fillna(0)
 
