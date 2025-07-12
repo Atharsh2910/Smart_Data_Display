@@ -16,32 +16,33 @@ except Exception:
 app = Flask(__name__, static_folder='templates/static', template_folder='templates')
 CORS(app)
 
-# === Serve React Frontend (static + index) ===
+# === Serve React Frontend ===
 @app.route('/')
 def serve_index():
     return send_from_directory('templates', 'index.html')
 
 @app.route('/<path:path>')
 def serve_static(path):
-    # Serve static files or fallback to index.html (React routing)
     full_path = os.path.join('templates', path)
     if os.path.exists(full_path):
         return send_from_directory('templates', path)
     return send_from_directory('templates', 'index.html')
 
-# === Utility to Load Product Data from CSV ===
+# === Load Product Data from CSV ===
 def load_data(category):
     try:
-        filepath = f"data/{category}.csv"
+        filepath = os.path.join(os.path.dirname(__file__), "data", f"{category}.csv")
+        print(f"[DEBUG] Loading: {filepath}")  # Debug log
         df = pd.read_csv(filepath)
         df["rating"] = pd.to_numeric(df["rating"], errors="coerce").fillna(0)
         df["price"] = pd.to_numeric(df["price"], errors="coerce").fillna(0)
         return df.to_dict(orient="records")
     except Exception as e:
-        print(f"Error loading {category} data:", e)
+        print(f"[ERROR] Failed to load '{category}' data:", e)
+        traceback.print_exc()
         return []
 
-# === API: Get Products ===
+# === Product API Endpoint ===
 @app.route("/api/products")
 def get_products():
     category = request.args.get("category", "books")
@@ -60,9 +61,10 @@ def get_products():
     elif sort == "rating_desc":
         products.sort(key=lambda x: x.get("rating", 0), reverse=True)
 
+    print(f"[DEBUG] Returning {len(products)} products for category: {category}")
     return jsonify(products)
 
-# === API: Chatbot ===
+# === Chatbot Endpoint ===
 @app.route("/chatbot", methods=["POST"])
 def chatbot():
     try:
@@ -90,7 +92,7 @@ def chatbot():
         traceback.print_exc()
         return jsonify({"response": "Something went wrong with the chatbot."}), 500
 
-# === Start App ===
+# === Run Flask on Render-assigned port ===
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 10000))
     app.run(host="0.0.0.0", port=port)
