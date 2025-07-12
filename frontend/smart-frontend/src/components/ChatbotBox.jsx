@@ -1,52 +1,48 @@
-import React, { useState } from "react";
-import axios from "axios";
-import "./ChatbotBox.css";
+import React, { useState } from 'react';
+import axios from 'axios';
+import './ChatbotBox.css';
 
-const ChatbotBox = () => {
-  const [message, setMessage] = useState("");
+function ChatbotBox() {
+  const [input, setInput] = useState('');
   const [chat, setChat] = useState([]);
-  const [loading, setLoading] = useState(false);
 
   const sendMessage = async () => {
-    if (!message.trim()) return;
-
-    const newChat = [...chat, { from: "user", text: message }];
-    setChat(newChat);
-    setLoading(true);
+    if (!input.trim()) return;
+    const userMessage = { sender: 'user', text: input };
+    setChat([...chat, userMessage]);
 
     try {
-      const res = await axios.post("http://localhost:5000/chatbot", { message });
-      setChat([...newChat, { from: "bot", text: res.data.response }]);
-    } catch (err) {
-      console.error("❌ Chatbot Error:", err);
-      setChat([...newChat, { from: "bot", text: "⚠️ Failed to connect to chatbot." }]);
+      const response = await axios.post('/chatbot', { message: input });
+      const botMessage = { sender: 'bot', text: response.data.response };
+      setChat(prev => [...prev, botMessage]);
+    } catch (error) {
+      setChat(prev => [...prev, { sender: 'bot', text: 'Error contacting chatbot.' }]);
     }
 
-    setMessage("");
-    setLoading(false);
+    setInput('');
   };
 
   return (
-    <div className="chatbot-container">
-      <h3>Ask ProductBot</h3>
-      <div className="chat-window">
-        {chat.map((c, i) => (
-          <div key={i} className={c.from}>
-            {c.text}
+    <div className="chatbot-box">
+      <div className="chat-history">
+        {chat.map((msg, idx) => (
+          <div key={idx} className={`chat-msg ${msg.sender}`}>
+            {msg.text}
           </div>
         ))}
-        {loading && <div className="bot">Typing...</div>}
       </div>
       <div className="chat-input">
         <input
-          value={message}
-          onChange={(e) => setMessage(e.target.value)}
-          placeholder="Ask about products..."
+          type="text"
+          value={input}
+          placeholder="Ask something..."
+          onChange={e => setInput(e.target.value)}
+          onKeyDown={e => e.key === 'Enter' && sendMessage()}
         />
         <button onClick={sendMessage}>Send</button>
       </div>
     </div>
   );
-};
+}
 
 export default ChatbotBox;
