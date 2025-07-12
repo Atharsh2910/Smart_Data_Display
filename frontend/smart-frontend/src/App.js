@@ -105,3 +105,61 @@ function App() {
 }
 
 export default App;
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import ProductCard from './components/ProductCard';
+import FilterBar from './components/FilterBar';
+import ChatbotBox from './components/ChatbotBox';
+import './App.css';
+
+function App() {
+  const [products, setProducts] = useState([]);
+  const [category, setCategory] = useState('books');
+  const [search, setSearch] = useState('');
+  const [sort, setSort] = useState('');
+
+  const fetchProducts = async () => {
+    try {
+      const response = await axios.get(`/api/products?category=${category}&search=${search}&sort=${sort}`);
+      setProducts(response.data);
+    } catch (error) {
+      console.error("Error fetching products:", error);
+      setProducts([]);
+    }
+  };
+
+  useEffect(() => {
+    fetchProducts();
+  }, [category, search, sort]);
+
+  return (
+    <div className="App">
+      <header>
+        <h1>Smart Data Display</h1>
+      </header>
+
+      <FilterBar
+        category={category}
+        setCategory={setCategory}
+        search={search}
+        setSearch={setSearch}
+        sort={sort}
+        setSort={setSort}
+      />
+
+      <div className="product-grid">
+        {products.length === 0 ? (
+          <p>No products found.</p>
+        ) : (
+          products.map((product, index) => (
+            <ProductCard key={index} product={product} />
+          ))
+        )}
+      </div>
+
+      <ChatbotBox />
+    </div>
+  );
+}
+
+export default App;
