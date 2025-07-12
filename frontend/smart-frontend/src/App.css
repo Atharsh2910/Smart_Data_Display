@@ -1,0 +1,99 @@
+/* src/App.css */
+
+body {
+  margin: 0;
+  font-family: 'Segoe UI', sans-serif;
+  background-color: #f5f7fa;
+}
+
+.app-container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.navbar {
+  background-color: #0d47a1;
+  color: white;
+  padding: 16px;
+  text-align: center;
+  font-size: 1.8rem;
+  font-weight: bold;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.main-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.product-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 24px;
+  margin-top: 24px;
+}
+
+.no-products {
+  text-align: center;
+  color: #555;
+  font-style: italic;
+  margin-top: 20px;
+}
+
+/* Floating Chatbot Icon */
+.chatbot-float-icon {
+  position: fixed;
+  bottom: 32px;
+  right: 32px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  z-index: 1000;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  border-radius: 50%;
+  padding: 0;
+}
+
+/* Floating Chatbot Panel */
+.chatbot-float-panel {
+  position: fixed;
+  bottom: 90px;
+  right: 32px;
+  z-index: 1001;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.18);
+  max-width: 350px;
+  width: 100%;
+  padding: 0 0 8px 0;
+  animation: chatbot-fade-in 0.2s;
+}
+
+@keyframes chatbot-fade-in {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.chatbot-close-btn {
+  position: absolute;
+  top: 8px;
+  right: 12px;
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  color: #0d47a1;
+  cursor: pointer;
+  z-index: 10;
+  padding: 0;
+  line-height: 1;
+}
+
+/* Make sure chatbot container fits panel */
+.chatbot-float-panel .chatbot-container {
+  margin: 0;
+  max-width: 100%;
+  box-shadow: none;
+  border-radius: 12px;
+}

@@ -1,0 +1,18 @@
+{
+  "files": {
+    "main.css": "/static/css/main.42a2847d.css",
+    "main.js": "/static/js/main.ac7b0531.js",
+    "static/js/453.0b5dfa36.chunk.js": "/static/js/453.0b5dfa36.chunk.js",
+    "static/media/books.jpg": "/static/media/books.a7a5f8c5dd735ac26703.jpg",
+    "static/media/electronics.jpg": "/static/media/electronics.e3ee63a3bf2e919f0cbc.jpg",
+    "static/media/personal.jpg": "/static/media/personal.465861e4faa24ab04931.jpg",
+    "index.html": "/index.html",
+    "main.42a2847d.css.map": "/static/css/main.42a2847d.css.map",
+    "main.ac7b0531.js.map": "/static/js/main.ac7b0531.js.map",
+    "453.0b5dfa36.chunk.js.map": "/static/js/453.0b5dfa36.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.42a2847d.css",
+    "static/js/main.ac7b0531.js"
+  ]
+}

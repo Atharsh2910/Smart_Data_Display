@@ -1,0 +1,30 @@
+/* src/components/ProductCard.css */
+
+.card {
+    background: white;
+    padding: 16px;
+    border-radius: 10px;
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.06);
+    transition: transform 0.2s ease;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .card:hover {
+    transform: translateY(-4px);
+  }
+  
+  .card img {
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+    border-radius: 6px;
+  }
+  
+  .details {
+    margin-top: 12px;
+    flex-grow: 1;
+  }
+  
+  
