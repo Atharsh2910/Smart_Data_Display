@@ -32,7 +32,7 @@ def serve_static(path):
 # === Utility to Load Product Data from CSV ===
 def load_data(category):
     try:
-        filepath = f"data/{category}.csv"
+        filepath = os.path.join("data", f"{category}.csv")
         df = pd.read_csv(filepath)
         df["rating"] = pd.to_numeric(df["rating"], errors="coerce").fillna(0)
         df["price"] = pd.to_numeric(df["price"], errors="coerce").fillna(0)
