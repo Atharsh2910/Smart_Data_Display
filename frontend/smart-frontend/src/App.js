@@ -13,7 +13,7 @@ function App() {
   const [sort, setSort] = useState("");
   const [showChatbot, setShowChatbot] = useState(false);
 
-  const API_BASE = "http://localhost:5000/api/products";
+  const API_BASE = "/api/products";
 
   const fetchProducts = useCallback(async () => {
     try {
