@@ -4,7 +4,7 @@ import pandas as pd
 import os
 import traceback
 
-# Optional Ollama chatbot support
+# Optional Ollama support
 try:
     from ollama import Client
     ollama_client = Client()
@@ -17,7 +17,7 @@ except Exception:
 app = Flask(__name__, static_folder='templates/static', template_folder='templates')
 CORS(app)
 
-# === Serve React frontend (index.html + static files) ===
+# === Serve React frontend ===
 @app.route('/')
 def serve_index():
     return send_from_directory('templates', 'index.html')
@@ -29,24 +29,33 @@ def serve_static(path):
         return send_from_directory('templates', path)
     return send_from_directory('templates', 'index.html')
 
-# === Load CSV data safely using absolute path ===
+# === Load CSV data using absolute path ===
 def load_data(category):
     try:
         filepath = os.path.join(os.path.dirname(__file__), "data", f"{category}.csv")
-        print(f"[DEBUG] Trying to load file: {filepath}")
+        print(f"[DEBUG] Trying to load: {filepath}")
+
+        if not os.path.exists(filepath):
+            print(f"[ERROR] File does not exist: {filepath}")
+            return []
+
         df = pd.read_csv(filepath)
+        print(f"[DEBUG] Loaded raw rows: {df.shape[0]}")
+
+        # Safely convert rating and price columns
         df["rating"] = pd.to_numeric(df.get("rating", 0), errors="coerce").fillna(0)
         df["price"] = pd.to_numeric(df.get("price", 0), errors="coerce").fillna(0)
+
         products = df.to_dict(orient="records")
-        print(f"[DEBUG] Loaded {len(products)} products for category '{category}'")
+        print(f"[DEBUG] Parsed products: {len(products)}")
         return products
+
     except Exception as e:
         print(f"[ERROR] Failed to load data for category '{category}': {e}")
         traceback.print_exc()
         return []
 
-
-# === API: Get products by category, search, and sort ===
+# === API: Get products by category, search, sort ===
 @app.route("/api/products")
 def get_products():
     category = request.args.get("category", "books")
@@ -65,7 +74,7 @@ def get_products():
     elif sort == "rating_desc":
         products.sort(key=lambda x: x.get("rating", 0), reverse=True)
 
-    print(f"[DEBUG] Returning {len(products)} products for category: {category}")
+    print(f"[DEBUG] Returning {len(products)} products for category '{category}'")
     return jsonify(products)
 
 # === API: Chatbot ===
@@ -96,7 +105,7 @@ def chatbot():
         traceback.print_exc()
         return jsonify({"response": "An error occurred in the chatbot."}), 500
 
-# === Start the server on Render with dynamic PORT ===
+# === Run app on Render's dynamic PORT ===
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 10000))
     app.run(host="0.0.0.0", port=port)
