@@ -13,7 +13,7 @@ function App() {
   const [sort, setSort] = useState("");
   const [showChatbot, setShowChatbot] = useState(false);
 
-  const API_BASE = "/api/products";
+  const API_BASE = "http://localhost:10000/api/products";
 
   const fetchProducts = useCallback(async () => {
     try {
@@ -24,10 +24,10 @@ function App() {
         setProducts(res.data);
       } else {
         setProducts([]);
-        console.warn("⚠️ API did not return array");
+        console.warn("API did not return array");
       }
     } catch (err) {
-      console.error("❌ Failed to fetch products:", err);
+      console.error("Failed to fetch products:", err);
       setProducts([]);
     }
   }, [category, search, sort]);
