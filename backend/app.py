@@ -4,7 +4,7 @@ import pandas as pd
 import os
 import traceback
 
-# Optional Ollama support
+# Optional Ollama chatbot support
 try:
     from ollama import Client
     ollama_client = Client()
@@ -13,10 +13,11 @@ except Exception:
     ollama_client = None
     OLLAMA_ENABLED = False
 
+# Initialize Flask app
 app = Flask(__name__, static_folder='templates/static', template_folder='templates')
 CORS(app)
 
-# === Serve React Frontend ===
+# === Serve React frontend (index.html + static files) ===
 @app.route('/')
 def serve_index():
     return send_from_directory('templates', 'index.html')
@@ -28,21 +29,23 @@ def serve_static(path):
         return send_from_directory('templates', path)
     return send_from_directory('templates', 'index.html')
 
-# === Load Product Data from CSV ===
+# === Load CSV data safely using absolute path ===
 def load_data(category):
     try:
         filepath = os.path.join(os.path.dirname(__file__), "data", f"{category}.csv")
-        print(f"[DEBUG] Loading: {filepath}")  # Debug log
+        print(f"[DEBUG] Trying to load file: {filepath}")
         df = pd.read_csv(filepath)
-        df["rating"] = pd.to_numeric(df["rating"], errors="coerce").fillna(0)
-        df["price"] = pd.to_numeric(df["price"], errors="coerce").fillna(0)
-        return df.to_dict(orient="records")
+        df["rating"] = pd.to_numeric(df.get("rating", 0), errors="coerce").fillna(0)
+        df["price"] = pd.to_numeric(df.get("price", 0), errors="coerce").fillna(0)
+        products = df.to_dict(orient="records")
+        print(f"[DEBUG] Loaded {len(products)} products for category '{category}'")
+        return products
     except Exception as e:
-        print(f"[ERROR] Failed to load '{category}' data:", e)
+        print(f"[ERROR] Failed to load data for category '{category}': {e}")
         traceback.print_exc()
         return []
 
-# === Product API Endpoint ===
+# === API: Get products by category, search, and sort ===
 @app.route("/api/products")
 def get_products():
     category = request.args.get("category", "books")
@@ -52,7 +55,7 @@ def get_products():
     products = load_data(category)
 
     if search:
-        products = [p for p in products if search in p.get("title", "").lower()]
+        products = [p for p in products if search in str(p.get("title", "")).lower()]
 
     if sort == "price_asc":
         products.sort(key=lambda x: x.get("price", 0))
@@ -64,7 +67,7 @@ def get_products():
     print(f"[DEBUG] Returning {len(products)} products for category: {category}")
     return jsonify(products)
 
-# === Chatbot Endpoint ===
+# === API: Chatbot ===
 @app.route("/chatbot", methods=["POST"])
 def chatbot():
     try:
@@ -75,7 +78,7 @@ def chatbot():
 
         if not OLLAMA_ENABLED:
             return jsonify({
-                "response": f"(Mock AI) You asked: '{user_message}' — this is a demo response."
+                "response": f"(Mock AI) You asked: '{user_message}' — this is a simulated response."
             })
 
         response = ollama_client.chat(
@@ -90,9 +93,9 @@ def chatbot():
 
     except Exception as e:
         traceback.print_exc()
-        return jsonify({"response": "Something went wrong with the chatbot."}), 500
+        return jsonify({"response": "An error occurred in the chatbot."}), 500
 
-# === Run Flask on Render-assigned port ===
+# === Start the server on Render with dynamic PORT ===
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 10000))
     app.run(host="0.0.0.0", port=port)
