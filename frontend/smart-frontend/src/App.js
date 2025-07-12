@@ -105,7 +105,6 @@ function App() {
 }
 
 export default App;
-import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import ProductCard from './components/ProductCard';
 import FilterBar from './components/FilterBar';
