@@ -38,20 +38,13 @@ def load_data(category):
         df["rating"] = pd.to_numeric(df.get("rating", 0), errors="coerce").fillna(0)
         df["price"] = pd.to_numeric(df.get("price", 0), errors="coerce").fillna(0)
         products = df.to_dict(orient="records")
-        # Patch: Ensure all required fields exist for frontend
-        for p in products:
-            p.setdefault("title", "Unknown Product")
-            p.setdefault("price", 0)
-            p.setdefault("rating", 0)
-            p.setdefault("description", p.get("author", "No description available"))
-            p.setdefault("image", "https://via.placeholder.com/150")
-            p.setdefault("category", category)
         print(f"[DEBUG] Loaded {len(products)} products for category '{category}'")
         return products
     except Exception as e:
         print(f"[ERROR] Failed to load data for category '{category}': {e}")
         traceback.print_exc()
         return []
+
 
 # === API: Get products by category, search, and sort ===
 @app.route("/api/products")
